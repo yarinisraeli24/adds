@@ -98,8 +98,12 @@ function onUpdate(event) {
 }
 
 function onDelete(event) {
-    event.preventDefault();
     console.log(event.path[0].id)
+    $.ajax({
+    url: 'deleteAd',
+    type: 'GET',
+    data: {id:event.path[0].id},
+    });
 }
 
 function onInputChange(event) {

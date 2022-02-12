@@ -130,17 +130,13 @@ app.post('/admin/login', (req, res) => {
   } else {
     res.sendStatus(404);
   }
+  })
 })
 
-  // if(!data){
-  //   res.send({status: 'failed', message:'didnt find admin in db'})
-  // }
-
-  // if(data.username === username && data.password === password){
-  //   res.redirect('./adminPannel.html')
-  // } else {
-  //   res.send({status: 'failed', message:'username or password invalide'})
-  // }
+app.get('/deleteAd', (req, res) => {
+  const { query: {id} } = req;
+  console.log(id)
+  db.collection('adds').deleteOne({_id: mongodb.ObjectId(id)});
 })
 
 io.on('connection', (socket) => {
