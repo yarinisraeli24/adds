@@ -1,0 +1,84 @@
+<!DOCTYPE html>   
+<html>   
+<head>  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">  
+<title> Login Page </title>  
+<style>   
+Body {  
+  font-family: Calibri, Helvetica, sans-serif;  
+  background-color: pink;  
+}  
+button {   
+       background-color: #4CAF50;   
+       width: 100%;  
+        color: orange;   
+        padding: 15px;   
+        margin: 10px 0px;   
+        border: none;   
+        cursor: pointer;   
+         }   
+ form {   
+        border: 3px solid #f1f1f1;   
+    }   
+ input[type=text], input[type=password] {   
+        width: 100%;   
+        margin: 8px 0;  
+        padding: 12px 20px;   
+        display: inline-block;   
+        border: 2px solid green;   
+        box-sizing: border-box;   
+    }  
+ button:hover {   
+        opacity: 0.7;   
+    }   
+  .cancelbtn {   
+        width: auto;   
+        padding: 10px 18px;  
+        margin: 10px 5px;  
+    }   
+        
+     
+ .container {   
+        padding: 25px;   
+        background-color: lightblue;  
+    }   
+</style>   
+</head>    
+<body>    
+    <form>  
+        <div class="container">   
+            <label>Username : </label>   
+            <input id="username" type="text" placeholder="Enter Username" name="username" required>  
+            <label>Password : </label>   
+            <input id="password" type="password" placeholder="Enter Password" name="password" required>  
+            <button id="login">Login</button>   
+            <input type="checkbox" checked="checked"> Remember me   
+            <button type="button" class="cancelbtn"> Cancel</button>   
+            Forgot <a href="#"> password? </a>   
+        </div>   
+    </form>     
+</body>     
+
+<script>
+    $("#login").click(function (e) {
+        e.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const data = { username, password }
+        console.log(data)
+        $.ajax({
+            url: 'admin/login',
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+            statusCode:{ 
+                200: function(res) {
+                console.log('200', res)
+                window.document.write(res.responseText)
+            }
+        }
+        });
+    });
+</script>
+</html>  

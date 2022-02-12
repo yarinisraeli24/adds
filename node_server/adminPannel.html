@@ -1,0 +1,138 @@
+<!DOCTYPE html>   
+<html>   
+<head>  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">  
+<title> Admin Page </title>   
+</head>    
+<body>    
+    <form>  
+        <div class="container">
+        </div>
+    </form>     
+</body>     
+<script>
+    let addsList;
+
+function adName (rootHtmlElement, name) {
+    rootHtmlElement.innerHTML += `
+    <div>
+    <span>Ad name: </span>
+    <input value='${name}' onchange="onInputChange(event)"></input>
+    </div>
+    `;
+}
+
+function pictruesSrc (rootHtmlElement, pictures) {
+    pictures.map((picture, index) => {
+        rootHtmlElement.innerHTML += `
+        <div>
+        <span>Picture #${index + 1}: </span>
+        <input value='${picture}'></input>
+        </div>
+        ` 
+    })
+}
+
+function texts (rootHtmlElement, texts) {
+    texts.map((text, index) => {
+        rootHtmlElement.innerHTML += `
+        <div>
+            <span>Text #${index + 1}: </span>
+            <input value='${text}'></input>
+        </div>
+        `
+    })
+}
+
+function date (rootHtmlElement, calender) {
+    const {date, days, hours} = calender;
+
+    rootHtmlElement.innerHTML += `<span> Date: </span>`
+    date.map(d => {
+        rootHtmlElement.innerHTML += `
+        <div>
+            <input value='${new Date(d).getDate()}'></input>
+        </div>
+        ` 
+    })
+    rootHtmlElement.innerHTML += `<span> Days: </span>`
+    days.map(day => {
+        rootHtmlElement.innerHTML += `
+        <div>
+            <input value='${new Date(day).getDay()}'></input>
+        </div>
+        ` 
+    })
+    rootHtmlElement.innerHTML += `<span> Hours: </span>`
+    hours.map(hour => {
+        rootHtmlElement.innerHTML += `
+        <div>
+            <input value='${new Date(hour).getHours()}'></input>
+        </div>
+        ` 
+    })
+}
+
+function time (rootHtmlElement, time) {
+    rootHtmlElement.innerHTML += `
+    <div>
+        <span>Time: </span>
+        <input value='${time}'></input>
+    </div>
+    ` 
+}
+
+function template (rootHtmlElement, template) {
+    rootHtmlElement.innerHTML += `
+    <div>  
+        <span>Template</span>
+        <input value='${template}'></input>
+    </div>
+    ` 
+}
+
+function onUpdate(event) {
+    event.preventDefault();
+    console.log(event.path[0].id)
+}
+
+function onDelete(event) {
+    event.preventDefault();
+    console.log(event.path[0].id)
+}
+
+function onInputChange(event) {
+    console.log(event)
+}
+
+
+function displayAd(rootHtmlElement, ad){
+    const {_id, ad_name, Pictures, text_lines, ad_time, template, calender} = ad;
+        rootHtmlElement.innerHTML += '<div>'
+        adName(rootHtmlElement, ad_name)
+        pictruesSrc(rootHtmlElement, Pictures)
+        texts(rootHtmlElement, text_lines)
+        time(rootHtmlElement,ad_time)
+        // template(rootHtmlElement,template)
+        date(rootHtmlElement, calender)
+        rootHtmlElement.innerHTML += `
+            <button id=${_id} onclick="onUpdate(event)">Update</button>
+            <button id=${_id} onclick="onDelete(event)">delete</button>
+        </div>`
+}
+
+$.ajax({
+    url: 'admin/getAllAdds',
+    type: 'GET',
+    statusCode:{ 
+        200: function(res) {   
+            const rootHtmlElement = document.querySelector(".container")
+            res.map(ad => {
+                displayAd(rootHtmlElement, ad)
+            })
+        }
+    }
+});
+</script>
+</html>  
