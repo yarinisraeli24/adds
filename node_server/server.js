@@ -9,6 +9,7 @@ const { Server } = require("socket.io");
 const e = require('express');
 const io = new Server(server);
 const MongoClient = require('mongodb').MongoClient
+const bootstrap = require('bootstrap')
 
 
 //dependencies
@@ -137,6 +138,22 @@ app.get('/deleteAd', (req, res) => {
   const { query: {id} } = req;
   console.log(id)
   db.collection('adds').deleteOne({_id: mongodb.ObjectId(id)});
+})
+
+app.post('/changePassword', (req, res) => {
+  const { data } = res;
+  const {password, passwordrepeat } = data;
+  db.collection('admin').updateOne({username: "admin"}, (error,task) =>{
+    if(task){
+      if(password === passwordrepeat){
+        $set:{password: newPassword}
+      }
+      else{
+        res.sendStatus(404);
+      }
+    }
+  }
+  );
 })
 
 io.on('connection', (socket) => {

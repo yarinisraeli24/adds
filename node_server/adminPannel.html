@@ -3,13 +3,41 @@
 <head>  
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">  
+    <link rel="stylesheet" href="./static/style.css">
+
+
 <title> Admin Page </title>   
 </head>    
 <body>    
-    <form>  
-        <div class="container">
+    <div class="adminContainer">
+        <h1 class="adminTitel">Admin Pannel</h1>
+        <h2 class="adminTitel">Ads</h2>        
+        <form>  
+            <div class="container">
+            </div>
+        </form>
+        <h2 class="adminTitel">-------------------------------------------------------------------------------------------</h2>        
+        <h2 class="adminTitel">Users (Connected/disconnected)</h2>
+        <h2 class="adminTitel">-------------------------------------------------------------------------------------------</h2>        
+        <h2 class="adminTitel">Change Password</h2>
+        <div class="password">
+            <div>enter your new password (8 characters minimum)</div>
+            <div>
+                <label for="pass">Password:</label>
+                <input type="password" id="pass" name="password"
+                       minlength="8" required>
+            </div>
+            <div>
+                <label for="pass">Repeat Password:</label>
+                <input type="password" id="passrepeat" name="password"
+                       minlength="8" required>
+            </div>
+            <button id="passwordSubmit" onclick="onChangePassword()">Confirm</button>   
+
         </div>
-    </form>     
+    </div>
+   
+
 </body>     
 <script>
     let addsList;
@@ -106,6 +134,26 @@ function onDelete(event) {
     });
 }
 
+function onChangePassword(event) {
+    console.log(event.path[0].id)
+    console.log("passchangeeee")
+    const password = document.getElementById("pass").value;
+    const passwordrepeat = document.getElementById("passrepeat").value;
+    const data = {password, passwordrepeat }
+    $.ajax({
+        url: 'admin/login',
+        type: 'POST',
+        dataType: 'json',
+        data: data,
+        statusCode:{ 
+            200: function(res) {
+        }
+    }
+    });
+}
+
+
+
 function onInputChange(event) {
     console.log(event)
 }
@@ -132,8 +180,13 @@ $.ajax({
     statusCode:{ 
         200: function(res) {   
             const rootHtmlElement = document.querySelector(".container")
+            let i = 1;
             res.map(ad => {
-                displayAd(rootHtmlElement, ad)
+                rootHtmlElement.innerHTML +=`<div class="ads${i}">`
+                displayAd(document.querySelector(`.ads${i}`), ad)
+                rootHtmlElement.innerHTML += `</div>`
+                i++;
+
             })
         }
     }
