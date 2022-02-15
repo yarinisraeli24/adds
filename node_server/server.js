@@ -134,6 +134,12 @@ app.get('/admin/getAllAdds', (req, res) => {
   })
 })
 
+app.get('/admin/getAllUsers', (req, res) => {
+  db.collection('users').find().toArray((error,result) => {
+    res.send(result);
+  })
+})
+
 app.post('/admin/login', (req, res) => {
   const { body } = req;
   const { username, password } = body;
@@ -156,7 +162,7 @@ app.post('/admin/login', (req, res) => {
 
 app.get('/deleteAd', (req, res) => {
   const { query: {id} } = req;
-  db.collection('AdminUser').findOne({session:req.sessionID},(err,result)=>{
+  db.collection('admin').findOne({session:req.sessionID},(err,result)=>{
     db.collection('adds').deleteOne({_id: mongodb.ObjectId(id)});
   res.send("delete ad successfully")
   });
@@ -164,22 +170,44 @@ app.get('/deleteAd', (req, res) => {
 
 app.post('/addAd/add', (req, res) => {
   const { body } = req;
-  console.log(body)
-  db.collection('adds').insertOne(body);
+  db.collection('admin').findOne({session:req.sessionID},(err,result)=>{
+    db.collection('adds').insertOne(body);
+  res.send("ad added successfully")
+  });
 })
 
 app.post('/updateAd', (req, res) => {
   const { _id,name } = req;
-  console
-  db.collection('adds').updateOne({_id: mongodb.ObjectId(_id)},{$set:{ad_name:name}});
+  db.collection('admin').findOne({session:req.sessionID},(err,result)=>{
+    db.collection('adds').updateOne({_id: mongodb.ObjectId(_id)},{$set:{ad_name:name}});
+    res.send("ad updated successfully")
+  });
 })
 
 app.post('/changePassword', (req, res) => {
   const { body } = req;
-  const {password, passwordrepeat } = body;
-  db.collection('admin').updateOne({username: "admin"},  {$set:{password:password} }
-  );
-})
+  const {newName, oldName, newPassword } = body;
+  if(newName!="" && newPassword!=""){
+    db.collection('admin').updateOne({username: oldName}, {
+      $set:{password:newPassword , username: newName}
+    })
+    res.send("username and password changed successfully")
+
+  }
+  else{
+    if(newName=="" && newPassword=="")
+      return;
+    if(newName==""){
+      db.collection('admin').updateOne({username: oldName}, {$set:{password:newPassword}})
+    res.send("password changed successfully")
+
+    if(newPassword==""){
+      db.collection('admin').updateOne({username: oldName}, {$set:{username: newName}})
+    res.send("username changed successfully")
+
+    }
+  }}});
+
 
 io.on('connection', (socket) => {
  const userId = new mongodb.ObjectID();

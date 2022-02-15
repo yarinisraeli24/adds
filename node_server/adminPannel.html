@@ -19,20 +19,31 @@
          <a href="./addAd">add new ad</a>
         <h2 class="adminTitel">-------------------------------------------------------------------------------------------</h2>        
         <h2 class="adminTitel">Users (Connected/disconnected)</h2>
+        <table class="users">
+            <tr>
+              <th class="user">UserId</th>
+              <th class="user">Screen</th>
+              <th class="user">isConnected</th>
+            </tr>
+        </table>
         <h2 class="adminTitel">-------------------------------------------------------------------------------------------</h2>        
-        <h2 class="adminTitel">Change Password</h2>
+        <h2 class="adminTitel">Change User Name and Password</h2>
         <div class="password">
-            <div>enter your new password (8 characters minimum)</div>
+            <div>enter your new username or password (8 characters minimum). If you leave it empty there will be no changes</div>
             <div>
-                <label for="pass">Password:</label>
+                <label for="name">Old User Name(Mandatory):</label>
+                <input  id="oldName" >
+            </div>
+            <div>
+                <label for="name">New User Name:</label>
+                <input  id="newName" >
+            </div>
+            <div>
+                <label for="pass">New Password:</label>
                 <input type="password" id="pass" name="password"
                        minlength="8" required>
             </div>
-            <div>
-                <label for="pass">Repeat Password:</label>
-                <input type="password" id="passrepeat" name="password"
-                       minlength="8" required>
-            </div>
+
             <button id="passwordSubmit" onclick="onChangePassword()">Confirm</button>   
 
         </div>
@@ -121,6 +132,17 @@ function template (rootHtmlElement, template) {
     ` 
 }
 
+function getUsers (rootHtmlElement, ) {
+    texts.map((text, index) => {
+        rootHtmlElement.innerHTML += `
+        <div>
+            <span>Text #${index + 1}: </span>
+            <input value='${text}'></input>
+        </div>
+        `
+    })
+}
+
 function onUpdate(event) {
     event.preventDefault();
     const _id= event.path[0].id;
@@ -143,9 +165,11 @@ function onDelete(event) {
 }
 
 function onChangePassword(event) {
-    const password = document.getElementById("pass").value;
-    const passwordrepeat = document.getElementById("passrepeat").value;
-    const data = {password, passwordrepeat }
+    const newName = document.getElementById("newName").value;
+    const oldName = document.getElementById("oldName").value;
+    const newPassword = document.getElementById("pass").value;
+    const data = {newName,oldName, newPassword}
+    console.log(data)
     $.ajax({
         url: '/changePassword',
         type: 'POST',
@@ -153,6 +177,7 @@ function onChangePassword(event) {
         data: data,
         statusCode:{ 
             200: function(res) {
+                alert(res.responseText);
         }
     }
     });
@@ -192,6 +217,19 @@ $.ajax({
                 displayAd(document.querySelector(`.ads${i}`), ad)
                 rootHtmlElement.innerHTML += `</div>`
                 i++;
+
+            })
+        }
+    }
+});
+$.ajax({
+    url: 'admin/getAllUsers',
+    type: 'GET',
+    statusCode:{ 
+        200: function(res) {   
+            const rootHtmlElement = document.querySelector(".users")
+            res.map(user => {
+                rootHtmlElement.innerHTML +=`<tr><td class="user">${user.id}</td><td class="user">${user.screen}</td><td class="user">${user.connected}</td></tr>`
 
             })
         }

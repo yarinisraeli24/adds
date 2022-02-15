@@ -111,3 +111,10 @@ body{
 label {
     display: block;
 }
+.users{
+    border: 2px solid black;
+    background-color: blanchedalmond;
+}
+.user{
+    padding: 10px;
+}
