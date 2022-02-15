@@ -16,6 +16,7 @@
             <div class="container">
             </div>
         </form>
+         <a href="./addAd">add new ad</a>
         <h2 class="adminTitel">-------------------------------------------------------------------------------------------</h2>        
         <h2 class="adminTitel">Users (Connected/disconnected)</h2>
         <h2 class="adminTitel">-------------------------------------------------------------------------------------------</h2>        
@@ -135,13 +136,11 @@ function onDelete(event) {
 }
 
 function onChangePassword(event) {
-    console.log(event.path[0].id)
-    console.log("passchangeeee")
     const password = document.getElementById("pass").value;
     const passwordrepeat = document.getElementById("passrepeat").value;
     const data = {password, passwordrepeat }
     $.ajax({
-        url: 'admin/login',
+        url: '/changePassword',
         type: 'POST',
         dataType: 'json',
         data: data,

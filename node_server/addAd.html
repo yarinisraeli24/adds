@@ -1,0 +1,49 @@
+<!DOCTYPE html>   
+<html>   
+<head>  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">  
+    <link rel="stylesheet" href="./static/style.css">
+<h1>Add New Ad</h1>
+
+</head>  
+<body>
+    <div>
+    <label for="Add name">name</label> <input type="text" id="ad_name"><br>
+    <label for="Pictures">Pictures</label>
+     <input type="url" id="pictureUrl1">
+     <input type="url" id="pictureUrl2"><br>
+    <label for="Text lines">Text lines</label> 
+    <input type="text" id="text1">
+    <input type="text" id="text2">
+    <input type="text" id="text3">
+    <input type="text" id="text4"><br>
+    <button id="add" onclick="onAddAd()">add</button>
+</div>
+</body>
+<script>
+function onAddAd(event) {
+    const adName = document.getElementById("ad_name").value;
+    const text1 = document.getElementById("text1").value;
+    const text2 = document.getElementById("text2").value;
+    const text3 = document.getElementById("text3").value;
+    const text4 = document.getElementById("text4").value;
+    const textLines={text1,text2,text3,text4};
+    const pic1=document.getElementById("pictureUrl1").value;
+    const pic2=document.getElementById("pictureUrl2").value;
+    const picturesUrls={pic1,pic2};
+    const data = {adName,textLines, picturesUrls }
+    console.log(data)
+    $.ajax({
+        url: 'addAd/add',
+        type: 'POST',
+        dataType: 'json',
+        data: data,
+        statusCode:{ 
+            200: function(res) {
+        }
+    }
+    });
+}
+</script>
+

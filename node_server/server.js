@@ -9,7 +9,6 @@ const { Server } = require("socket.io");
 const e = require('express');
 const io = new Server(server);
 const MongoClient = require('mongodb').MongoClient
-const bootstrap = require('bootstrap')
 
 
 //dependencies
@@ -104,7 +103,10 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname + '/login.html'));
 })
 
-
+app.get('/addAd', (req, res) => {
+  //disconnect connect id
+  res.sendFile(path.join(__dirname + '/addAd.html'));
+})
 app.get('/getAd', (req, res) => {
   const { query: {screen}} = req;
   const screenId = Number.parseInt(screen);
@@ -112,6 +114,7 @@ app.get('/getAd', (req, res) => {
     res.send(result);
   })
 })
+
 
 app.get('/admin/getAllAdds', (req, res) => {
   db.collection('adds').find().toArray((error,result) => {
@@ -140,19 +143,16 @@ app.get('/deleteAd', (req, res) => {
   db.collection('adds').deleteOne({_id: mongodb.ObjectId(id)});
 })
 
+app.post('/addAd/add', (req, res) => {
+  const { body } = req;
+  console.log(body)
+  db.collection('adds').insertOne(body);
+})
+
 app.post('/changePassword', (req, res) => {
-  const { data } = res;
-  const {password, passwordrepeat } = data;
-  db.collection('admin').updateOne({username: "admin"}, (error,task) =>{
-    if(task){
-      if(password === passwordrepeat){
-        $set:{password: newPassword}
-      }
-      else{
-        res.sendStatus(404);
-      }
-    }
-  }
+  const { body } = req;
+  const {password, passwordrepeat } = body;
+  db.collection('admin').updateOne({username: "admin"},  {$set:{password:password} }
   );
 })
 
