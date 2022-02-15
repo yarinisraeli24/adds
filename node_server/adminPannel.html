@@ -47,7 +47,7 @@ function adName (rootHtmlElement, name) {
     rootHtmlElement.innerHTML += `
     <div>
     <span>Ad name: </span>
-    <input value='${name}' onchange="onInputChange(event)"></input>
+    <input value='${name}' onchange="onInputChange(event)" id="name"></input>
     </div>
     `;
 }
@@ -57,7 +57,7 @@ function pictruesSrc (rootHtmlElement, pictures) {
         rootHtmlElement.innerHTML += `
         <div>
         <span>Picture #${index + 1}: </span>
-        <input value='${picture}'></input>
+        <input value='${picture}' id="picture"></input>
         </div>
         ` 
     })
@@ -123,7 +123,14 @@ function template (rootHtmlElement, template) {
 
 function onUpdate(event) {
     event.preventDefault();
-    console.log(event.path[0].id)
+    const _id= event.path[0].id;
+    const nameAd=document.getElementById("name").value;
+    const data={_id,nameAd};
+    $.ajax({
+    url: '/updateAd',
+    type: 'POST',
+    data: data,
+    });
 }
 
 function onDelete(event) {

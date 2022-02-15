@@ -149,6 +149,12 @@ app.post('/addAd/add', (req, res) => {
   db.collection('adds').insertOne(body);
 })
 
+app.post('/updateAd', (req, res) => {
+  const { _id,name } = req;
+  console
+  db.collection('adds').updateOne({_id: mongodb.ObjectId(_id)},{$set:{ad_name:name}});
+})
+
 app.post('/changePassword', (req, res) => {
   const { body } = req;
   const {password, passwordrepeat } = body;
