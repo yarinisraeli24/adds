@@ -9,6 +9,8 @@ const { Server } = require("socket.io");
 const e = require('express');
 const io = new Server(server);
 const MongoClient = require('mongodb').MongoClient
+var cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 
 //dependencies
@@ -93,14 +95,24 @@ app.use(express.static(__dirname + 'script.js'));
 app.use("/static", express.static('./static/'));
 app.use(express.json());
 app.use(express.urlencoded());
+app.use(session({
+    resave:false, 
+    saveUninitialized:true, 
+    secret:"uniqeId",
+  }))
 
 app.get('/', (req, res) => {
   //disconnect connect id
   res.sendFile(path.join(__dirname + '/client.html'));
 })
-app.get('/login', (req, res) => {
-  //disconnect connect id
-  res.sendFile(path.join(__dirname + '/login.html'));
+app.get('/Admin', (req, res) => {
+  db.collection('admin').findOne({session:req.sessionID},(err,result)=>{
+    if(result) {
+      res.sendFile(path.join(__dirname + '/adminPannel.html'));
+    } else {
+      res.sendFile(path.join(__dirname + '/login.html'));
+    }
+  });
 })
 
 app.get('/addAd', (req, res) => {
@@ -129,6 +141,11 @@ app.post('/admin/login', (req, res) => {
   db.collection('admin').findOne({username: username}, (error, task)=> {
     if(task){
       if(task.username === username && task.password === password){
+        db.collection('admin').updateOne({username: username},{
+          $set:{
+            session:req.sessionID
+          }
+        })
         res.sendFile(path.join(__dirname + '/adminPannel.html'));
       }
   } else {
@@ -139,8 +156,10 @@ app.post('/admin/login', (req, res) => {
 
 app.get('/deleteAd', (req, res) => {
   const { query: {id} } = req;
-  console.log(id)
-  db.collection('adds').deleteOne({_id: mongodb.ObjectId(id)});
+  db.collection('AdminUser').findOne({session:req.sessionID},(err,result)=>{
+    db.collection('adds').deleteOne({_id: mongodb.ObjectId(id)});
+  res.send("delete ad successfully")
+  });
 })
 
 app.post('/addAd/add', (req, res) => {
