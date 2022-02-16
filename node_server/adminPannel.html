@@ -58,7 +58,7 @@ function adName (rootHtmlElement, name, id) {
     rootHtmlElement.innerHTML += `
     <div>
     <span>Ad name: </span>
-    <input value='${name}' id="name_${id}"></input>
+    <input value='${name}' id="${id + "_0_name"}" onchange="onNameChange(event)"></input>
     </div>
     `;
 }
@@ -68,7 +68,7 @@ function pictruesSrc (rootHtmlElement, pictures, id) {
         rootHtmlElement.innerHTML += `
         <div>
         <span>Picture #${index + 1}: </span>
-        <input value='${picture}' onchange="onPictureChange(event)" id="${id+"_"+index}"></input>
+        <input value='${picture}' onchange="onPictureChange(event)" id="${id+"_"+index + "_picture"}"></input>
         </div>
         ` 
     })
@@ -79,7 +79,7 @@ function texts (rootHtmlElement, texts, id) {
         rootHtmlElement.innerHTML += `
         <div>
             <span>Text #${index + 1}: </span>
-            <input value='${text}'></input>
+            <input value='${text}' id='${id+"_"+index + "_text"}' onchange="onTextChange(event)"></input>
         </div>
         `
     })
@@ -89,7 +89,7 @@ function date (rootHtmlElement, calender, id) {
     const {date, days, hours} = calender;
 
     rootHtmlElement.innerHTML += `<span> Date: </span>`
-    date.map(d => {
+    date.map((d, index) => {
         const currentDate = new Date(d)
         const year = currentDate.getUTCFullYear();
         const month = currentDate.getMonth()+1;
@@ -97,23 +97,21 @@ function date (rootHtmlElement, calender, id) {
 
         rootHtmlElement.innerHTML += `
         <div>
-            <input value='${year+'/'+month+'/'+day}'></input>
+            <input value='${year+'/'+month+'/'+day}' id='${id+"_"+index + "_date"}' onchange='onDateChange(event)'></input>
         </div>
         ` 
     })
     rootHtmlElement.innerHTML += `<span> Days: </span>`
-    days.map(day => {
         rootHtmlElement.innerHTML += `
         <div>
-            <input value='${day}'></input>
+            <input value='${days}' id="${id +"_0_days"}" onchange="onDaysChange(event)"></input>
         </div>
         ` 
-    })
     rootHtmlElement.innerHTML += `<span> Hours: </span>`
-    hours.map(hour => {
+    hours.map((hour, index) => {
         rootHtmlElement.innerHTML += `
         <div>
-            <input value='${hour}'></input>
+            <input value='${hour}' id='${id+"_"+index + "_hour"}' onchange='onHourChange(event)'></input>
         </div>
         ` 
     })
@@ -150,26 +148,69 @@ function getUsers (rootHtmlElement, ) {
 
 function onUpdate(event) {
     event.preventDefault();
-    const _id= event.path[0].id;
-    const nameId = "name_" + _id;
-    const nameAd=document.getElementById(nameId).value;
-    const data={_id,nameAd};
+    const id= event.path[0].id;
+    const data= addsList.find((item) => item._id ===id);
     $.ajax({
+    contentType: 'application/json',   
+    dataType: 'json',
     url: '/updateAd',
     type: 'POST',
-    data: data,
+    data: JSON.stringify(data),
     });
 }
 
-function onPictureChange(event){
+function getDataById (event) {
     const data= event.path[0].id;
     const id = data.split("_")[0];
     const index = data.split("_")[1];
     const currentAd = addsList.find((item) => item._id ===id);
     const currentInput = document.getElementById(data).value;
-    console.log( currentAd.Pictures[index])
+    return {index, currentAd , currentInput};
+}
+
+function onPictureChange(event){
+    const {index, currentAd , currentInput} = getDataById(event);
+    console.log(currentAd.Pictures[index])
     currentAd.Pictures[index] = currentInput;
-    console.log( currentAd.Pictures[index])
+    console.log(currentAd.Pictures[index])
+}
+
+function onTextChange(event) {
+    const {index, currentAd , currentInput} = getDataById(event);
+    console.log(currentAd.text_lines[index])
+    currentAd.text_lines[index] = currentInput;
+    console.log(currentAd.text_lines[index])
+}
+
+function onDateChange(event) {
+    const {index, currentAd , currentInput} = getDataById(event);
+    console.log(currentAd.calender.date[index])
+    currentAd.calender.date[index] = new Date(currentInput);
+    console.log(currentAd.calender.date[index])
+}
+
+function onHourChange(event) {
+    const {index, currentAd , currentInput} = getDataById(event);
+    console.log(currentAd.calender.hours[index])
+    currentAd.calender.hours[index] = new Number(currentInput).valueOf();
+    console.log(currentAd.calender.hours[index])
+}
+
+function onNameChange(event) {
+    const {index, currentAd , currentInput} = getDataById(event);
+    console.log(currentAd.ad_name)
+    currentAd.ad_name = currentInput;
+    console.log(currentAd.ad_name)
+}
+
+function onDaysChange(event) {
+    const {index, currentAd , currentInput} = getDataById(event);
+    const changedDaysData = currentInput.split(',').map(day => new Number(day).valueOf());
+
+    console.log(changedDaysData);
+    console.log(currentAd.calender.days)
+    currentAd.calender.days = changedDaysData;
+    console.log(currentAd.calender.days)
 }
 
 function onDelete(event) {
@@ -198,10 +239,6 @@ function onChangePassword(event) {
     });
 }
 
-
-
-function onInputChange(event) {
-}
 
 
 function displayAd(rootHtmlElement, ad){

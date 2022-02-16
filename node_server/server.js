@@ -194,9 +194,9 @@ app.post('/addAd/add', (req, res) => {
 
 app.post('/updateAd', (req, res) => {
   const { body } = req;
-  const {_id, nameAd} = body;
+  body._id = mongodb.ObjectId(body._id);
   db.collection('admin').findOne({session:req.sessionID},(err,result)=>{
-    db.collection('adds').updateOne({_id: mongodb.ObjectId(_id)},{$set:{ad_name:nameAd}});
+    db.collection('adds').updateOne({_id: body._id},{$set:body});
     res.send("ad updated successfully")
   });
 })
