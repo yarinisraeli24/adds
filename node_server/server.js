@@ -121,6 +121,7 @@ app.get('/addAd', (req, res) => {
   //disconnect connect id
   res.sendFile(path.join(__dirname + '/addAd.html'));
 })
+
 app.get('/getAd', (req, res) => {
 
   const checkIfDateIsValid = (item) => {
@@ -204,6 +205,9 @@ app.post('/changePassword', (req, res) => {
   const { body } = req;
   const {newName, oldName, newPassword } = body;
   db.collection('admin').findOne({session:req.sessionID},(err,result)=>{
+  if(oldName==""){
+    res.send("old user name is mendatory")
+  }
   if(newName!="" && newPassword!=""){
     db.collection('admin').updateOne({username: oldName}, {$set:{password:newPassword , username: newName}})
     res.send("username and password changed successfully")

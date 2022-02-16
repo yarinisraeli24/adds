@@ -9,16 +9,23 @@
 </head>  
 <body>
     <div>
-    <label for="Add name">name</label> <input type="text" id="ad_name"><br>
+    <label for="Ad name">name</label> <input type="text" id="ad_name"><br>
     <label for="Pictures">Pictures</label>
-     <input type="url" id="pictureUrl1">
-     <input type="url" id="pictureUrl2"><br>
+    <input type="url" name="url" id="pictureUrl1"
+       placeholder="https://example.com"
+       pattern="https://.*" size="30"
+       required>
+     <input type="url" name="url" id="pictureUrl2"
+     placeholder="https://example.com"
+     pattern="https://.*" size="30"
+     required>
     <label for="Text lines">Text lines</label> 
     <input type="text" id="text1">
     <input type="text" id="text2">
     <input type="text" id="text3">
     <input type="text" id="text4"><br>
-    <button id="add" onclick="onAddAd()">add</button>
+    <button id="add" onclick="onAddAd()"><a href="./Admin">add</a></button>
+    
 </div>
 </body>
 <script>
@@ -52,5 +59,6 @@ function onAddAd(event) {
         }
     }
     });
+
 }
 </script>
