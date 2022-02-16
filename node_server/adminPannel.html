@@ -54,27 +54,27 @@
 <script>
     let addsList;
 
-function adName (rootHtmlElement, name) {
+function adName (rootHtmlElement, name, id) {
     rootHtmlElement.innerHTML += `
     <div>
     <span>Ad name: </span>
-    <input value='${name}' onchange="onInputChange(event)" id="name"></input>
+    <input value='${name}' id="name_${id}"></input>
     </div>
     `;
 }
 
-function pictruesSrc (rootHtmlElement, pictures) {
+function pictruesSrc (rootHtmlElement, pictures, id) {
     pictures.map((picture, index) => {
         rootHtmlElement.innerHTML += `
         <div>
         <span>Picture #${index + 1}: </span>
-        <input value='${picture}' id="picture"></input>
+        <input value='${picture}' onchange="onPictureChange(event)" id="${id+"_"+index}"></input>
         </div>
         ` 
     })
 }
 
-function texts (rootHtmlElement, texts) {
+function texts (rootHtmlElement, texts, id) {
     texts.map((text, index) => {
         rootHtmlElement.innerHTML += `
         <div>
@@ -85,14 +85,19 @@ function texts (rootHtmlElement, texts) {
     })
 }
 
-function date (rootHtmlElement, calender) {
+function date (rootHtmlElement, calender, id) {
     const {date, days, hours} = calender;
 
     rootHtmlElement.innerHTML += `<span> Date: </span>`
     date.map(d => {
+        const currentDate = new Date(d)
+        const year = currentDate.getUTCFullYear();
+        const month = currentDate.getMonth()+1;
+        const day =  currentDate.getDate();
+
         rootHtmlElement.innerHTML += `
         <div>
-            <input value='${new Date(d).getDate()}'></input>
+            <input value='${year+'/'+month+'/'+day}'></input>
         </div>
         ` 
     })
@@ -100,7 +105,7 @@ function date (rootHtmlElement, calender) {
     days.map(day => {
         rootHtmlElement.innerHTML += `
         <div>
-            <input value='${new Date(day).getDay()}'></input>
+            <input value='${day}'></input>
         </div>
         ` 
     })
@@ -108,13 +113,13 @@ function date (rootHtmlElement, calender) {
     hours.map(hour => {
         rootHtmlElement.innerHTML += `
         <div>
-            <input value='${new Date(hour).getHours()}'></input>
+            <input value='${hour}'></input>
         </div>
         ` 
     })
 }
 
-function time (rootHtmlElement, time) {
+function time (rootHtmlElement, time, id) {
     rootHtmlElement.innerHTML += `
     <div>
         <span>Time: </span>
@@ -146,7 +151,8 @@ function getUsers (rootHtmlElement, ) {
 function onUpdate(event) {
     event.preventDefault();
     const _id= event.path[0].id;
-    const nameAd=document.getElementById("name").value;
+    const nameId = "name_" + _id;
+    const nameAd=document.getElementById(nameId).value;
     const data={_id,nameAd};
     $.ajax({
     url: '/updateAd',
@@ -155,8 +161,18 @@ function onUpdate(event) {
     });
 }
 
+function onPictureChange(event){
+    const data= event.path[0].id;
+    const id = data.split("_")[0];
+    const index = data.split("_")[1];
+    const currentAd = addsList.find((item) => item._id ===id);
+    const currentInput = document.getElementById(data).value;
+    console.log( currentAd.Pictures[index])
+    currentAd.Pictures[index] = currentInput;
+    console.log( currentAd.Pictures[index])
+}
+
 function onDelete(event) {
-    console.log(event.path[0].id)
     $.ajax({
     url: 'deleteAd',
     type: 'GET',
@@ -169,7 +185,6 @@ function onChangePassword(event) {
     const oldName = document.getElementById("oldName").value;
     const newPassword = document.getElementById("pass").value;
     const data = {newName,oldName, newPassword}
-    console.log(data)
     $.ajax({
         url: '/changePassword',
         type: 'POST',
@@ -186,19 +201,17 @@ function onChangePassword(event) {
 
 
 function onInputChange(event) {
-    console.log(event)
 }
 
 
 function displayAd(rootHtmlElement, ad){
     const {_id, ad_name, Pictures, text_lines, ad_time, template, calender} = ad;
         rootHtmlElement.innerHTML += '<div>'
-        adName(rootHtmlElement, ad_name)
-        pictruesSrc(rootHtmlElement, Pictures)
-        texts(rootHtmlElement, text_lines)
-        time(rootHtmlElement,ad_time)
-        // template(rootHtmlElement,template)
-        date(rootHtmlElement, calender)
+        adName(rootHtmlElement, ad_name, _id)
+        pictruesSrc(rootHtmlElement, Pictures, _id)
+        texts(rootHtmlElement, text_lines, _id)
+        time(rootHtmlElement,ad_time, _id)
+        date(rootHtmlElement, calender, _id)
         rootHtmlElement.innerHTML += `
             <button id=${_id} onclick="onUpdate(event)">Update</button>
             <button id=${_id} onclick="onDelete(event)">delete</button>
@@ -212,9 +225,10 @@ $.ajax({
         200: function(res) {   
             const rootHtmlElement = document.querySelector(".container")
             let i = 1;
-            res.map(ad => {
+            addsList = res;
+            res.map((ad, index) => {
                 rootHtmlElement.innerHTML +=`<div class="ads${i}">`
-                displayAd(document.querySelector(`.ads${i}`), ad)
+                displayAd(document.querySelector(`.ads${i}`), ad, index)
                 rootHtmlElement.innerHTML += `</div>`
                 i++;
 

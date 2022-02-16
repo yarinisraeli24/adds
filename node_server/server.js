@@ -31,9 +31,9 @@ const ad1={
   "ad_time":10000,
   "template":1,
   "calender": {
-      "date":[new Date('January 1, 2021 00:00:00'), new Date('December 31, 2021 00:00:00')],
-      "days":[1,2,3],
-      "hours":[15,19]
+      "date":[new Date('January 1, 2021 00:00:00'), new Date('December 31, 2022 00:00:00')],
+      "days":[1,2,3,4,5],
+      "hours":[01,23]
   }
 }
 const ad2={
@@ -44,9 +44,9 @@ const ad2={
   "ad_time":10000,
   "template":2,
   "calender" : {
-      "date":[new Date('March 1, 2021 00:00:00'), new Date('April 30, 2021 23:59:00')],
-      "days":[2,3],
-      "hours":[15,19]
+      "date":[new Date('March 1, 2021 00:00:00'), new Date('April 30, 2022 23:59:00')],
+      "days":[2,3,4,5],
+      "hours":[01,19]
   }
 }
 const ad3={
@@ -59,7 +59,7 @@ const ad3={
   "calender" : {
       "date":[new Date('May 1, 2021 00:00:00'), new Date('June 15, 2022 23:59:00')],
       "days":[0,1,2,3,4,5,6],
-      "hours":[15,19]
+      "hours":[01,19]
   }
 }
 const ad4={
@@ -71,7 +71,7 @@ const ad4={
   "template":1,
   "calender" : {
       "date":[new Date('Marc 29, 2021 00:00:00'), new Date('April 15, 2022 23:59:00')],
-      "days":[1,2],
+      "days":[1,2,3,4],
       "hours":[15,19]
   }
 }
@@ -83,13 +83,15 @@ const ad5={
   "ad_time":10000,
   "template":2,
   "calender" : {
-      "date":[ new Date('April 1, 2021 00:00:00'), new Date('April 30, 2021 23:59:00')],
+      "date":[ new Date('April 1, 2021 00:00:00'), new Date('April 30, 2023 23:59:00')],
       "days":[1,2,3],
-      "hours":[15,19]
+      "hours":[01,23]
   }
 }
 const adds =[ad1,ad2,ad3,ad4,ad5];
 let db
+
+
 
 app.use(express.static(__dirname + 'script.js'));
 app.use("/static", express.static('./static/'));
@@ -120,10 +122,24 @@ app.get('/addAd', (req, res) => {
   res.sendFile(path.join(__dirname + '/addAd.html'));
 })
 app.get('/getAd', (req, res) => {
+
+  const checkIfDateIsValid = (item) => {
+    const now = new Date();
+    let isValidDate = false;
+    let isValidDay = false;
+    let isValidHour = false;
+
+    if(now.getTime() > item.calender.date[0] && now.getTime() < item.calender.date[1]) isValidDate = true;
+    isValidDay = item.calender.days.includes(now.getDay())  
+    if(now.getHours() >= item.calender.hours[0] && now.getHours() <= item.calender.hours[1]) isValidHour = true;
+
+    return isValidDate && isValidDay && isValidHour;
+  }
   const { query: {screen}} = req;
   const screenId = Number.parseInt(screen);
   db.collection('adds').find({id: screenId}).toArray((error,result) => {
-    res.send(result);
+    const filteredAds = result.filter((item) => checkIfDateIsValid(item));
+    res.send(filteredAds);
   })
 })
 
@@ -177,9 +193,10 @@ app.post('/addAd/add', (req, res) => {
 })
 
 app.post('/updateAd', (req, res) => {
-  const { _id,name } = req;
+  const { body } = req;
+  const {_id, nameAd} = body;
   db.collection('admin').findOne({session:req.sessionID},(err,result)=>{
-    db.collection('adds').updateOne({_id: mongodb.ObjectId(_id)},{$set:{ad_name:name}});
+    db.collection('adds').updateOne({_id: mongodb.ObjectId(_id)},{$set:{ad_name:nameAd}});
     res.send("ad updated successfully")
   });
 })
@@ -187,12 +204,10 @@ app.post('/updateAd', (req, res) => {
 app.post('/changePassword', (req, res) => {
   const { body } = req;
   const {newName, oldName, newPassword } = body;
+  db.collection('admin').findOne({session:req.sessionID},(err,result)=>{
   if(newName!="" && newPassword!=""){
-    db.collection('admin').updateOne({username: oldName}, {
-      $set:{password:newPassword , username: newName}
-    })
+    db.collection('admin').updateOne({username: oldName}, {$set:{password:newPassword , username: newName}})
     res.send("username and password changed successfully")
-
   }
   else{
     if(newName=="" && newPassword=="")
@@ -200,13 +215,15 @@ app.post('/changePassword', (req, res) => {
     if(newName==""){
       db.collection('admin').updateOne({username: oldName}, {$set:{password:newPassword}})
     res.send("password changed successfully")
+    }
 
     if(newPassword==""){
       db.collection('admin').updateOne({username: oldName}, {$set:{username: newName}})
     res.send("username changed successfully")
-
     }
-  }}});
+  }
+})});
+
 
 
 io.on('connection', (socket) => {
@@ -224,8 +241,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('screenUpdate', (screenId) => {
-      console.log(socket.id)
-      console.log(screenId)
       db.collection('users').updateOne({id: socket.id}, {$set: {screen: screenId}})
 
     })
@@ -235,7 +250,6 @@ server.listen(port, () => {
   MongoClient.connect(connectionString, (err, client) => {
     if (err) return console.error(err)
     db = client.db('adds-project')
-    console.log(db)
     db.collection('adds').drop()
     db.collection('adds').insertMany(adds)
     db.collection('users').drop()

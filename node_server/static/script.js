@@ -7,11 +7,10 @@ $.ajax({
   type: 'GET',
   data: {'screen': id},
   success: function(res) {
-      console.log(res)
       adds = res;
   },
   error: function(res){
-      console.log(res)
+      console.error(res)
   }
 });
 

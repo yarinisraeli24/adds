@@ -33,7 +33,6 @@ function onAddAd(event) {
     const pic2=document.getElementById("pictureUrl2").value;
     const picturesUrls={pic1,pic2};
     const data = {adName,textLines, picturesUrls }
-    console.log(data)
     $.ajax({
         url: 'addAd/add',
         type: 'POST',

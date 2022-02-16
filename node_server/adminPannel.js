@@ -21,5 +21,4 @@ $.ajax({
     }
 });
 
-console.log(res)
 
