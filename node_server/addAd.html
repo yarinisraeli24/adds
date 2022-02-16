@@ -23,21 +23,30 @@
 </body>
 <script>
 function onAddAd(event) {
-    const adName = document.getElementById("ad_name").value;
+    const ad_name = document.getElementById("ad_name").value;
     const text1 = document.getElementById("text1").value;
     const text2 = document.getElementById("text2").value;
     const text3 = document.getElementById("text3").value;
     const text4 = document.getElementById("text4").value;
-    const textLines={text1,text2,text3,text4};
+    const text_lines=[text1,text2,text3,text4];
     const pic1=document.getElementById("pictureUrl1").value;
     const pic2=document.getElementById("pictureUrl2").value;
-    const picturesUrls={pic1,pic2};
-    const data = {adName,textLines, picturesUrls }
+    const Pictures=[pic1,pic2];
+    const ad_time=10000;
+    const template=1;
+    const id=[1,2];
+    const calender= {
+        "date":[new Date('January 1, 2021 00:00:00'), new Date('December 31, 2022 00:00:00')],
+        "days":[1,2,3,4,5],
+        "hours":[01,23]
+    }
+    const data = {id,ad_name,Pictures,text_lines, ad_time,template,calender };
     $.ajax({
         url: 'addAd/add',
         type: 'POST',
+        contentType: 'application/json',   
         dataType: 'json',
-        data: data,
+        data: JSON.stringify(data),
         statusCode:{ 
             200: function(res) {
         }
@@ -45,4 +54,3 @@ function onAddAd(event) {
     });
 }
 </script>
-
