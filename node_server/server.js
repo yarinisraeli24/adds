@@ -128,8 +128,7 @@ app.get('/getAd', (req, res) => {
     let isValidDate = false;
     let isValidDay = false;
     let isValidHour = false;
-
-    if(now.getTime() > item.calender.date[0] && now.getTime() < item.calender.date[1]) isValidDate = true;
+    if(now.getTime() >new Date( item.calender.date[0]) && now.getTime() < new Date(item.calender.date[1])) isValidDate = true;
     isValidDay = item.calender.days.includes(now.getDay())  
     if(now.getHours() >= item.calender.hours[0] && now.getHours() <= item.calender.hours[1]) isValidHour = true;
 
